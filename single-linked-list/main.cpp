@@ -74,10 +74,10 @@ void Test() {
     struct ThrowOnCopy {
         ThrowOnCopy() = default;
         explicit ThrowOnCopy(int& copy_counter) noexcept
-            : countdown_ptr(&copy_counter) {
+                : countdown_ptr(&copy_counter) {
         }
         ThrowOnCopy(const ThrowOnCopy& other)
-            : countdown_ptr(other.countdown_ptr)  //
+                : countdown_ptr(other.countdown_ptr)  //
         {
             if (countdown_ptr) {
                 if (*countdown_ptr == 0) {
