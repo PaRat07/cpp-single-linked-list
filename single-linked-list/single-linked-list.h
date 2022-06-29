@@ -23,11 +23,11 @@ public:
     SingleLinkedList(){}
 
     SingleLinkedList(const SingleLinkedList<Type>& list) {
-        iterator_fill(list.begin(), list.end());
+        IteratorFill(list.begin(), list.end());
     }
 
     SingleLinkedList(const std::initializer_list<Type> list) {
-        iterator_fill(list.begin(), list.end());
+        IteratorFill(list.begin(), list.end());
     }
 
     ~SingleLinkedList() {
@@ -59,9 +59,9 @@ public:
         while (head_.next_node) {
             Node* buffer = head_.next_node;
             head_.next_node = head_.next_node->next_node;
-            --size_;
             delete buffer;
         }
+        size_ = 0;
     }
     // Шаблон класса «Базовый Итератор».
     // Определяет поведение итератора на элементы односвязного списка
@@ -193,28 +193,28 @@ public:
     }
 
     [[nodiscard]] bool operator>=(const SingleLinkedList<Type>& rhs) const noexcept {
-        return *this == rhs or *this > rhs;
+        return *this == rhs || !(*this < rhs);
     }
 
     [[nodiscard]] bool operator<=(const SingleLinkedList<Type>& rhs) const noexcept {
-        return *this == rhs or *this < rhs;
+        return *this == rhs || *this < rhs;
     }
 
     void operator=(const SingleLinkedList<Type>& rhs) {
         if (head_.next_node != rhs.head_.next_node) {
-            SingleLinkedList<Type> x(rhs);
-            swap(x);
+            SingleLinkedList<Type> buffer(rhs);
+            swap(buffer);
         }
     }
-    void swap(SingleLinkedList<Type>& rhs) noexcept {
+    void Swap(SingleLinkedList<Type>& rhs) noexcept {
         if (head_.next_node != rhs.head_.next_node) {
-            SingleLinkedList<Type> x;
-            std::swap(x.head_.next_node, rhs.head_.next_node);
-            std::swap(x.size_, rhs.size_);
-            std::swap(head_.next_node, x.head_.next_node);
-            std::swap(size_, x.size_);
-            std::swap(x.head_.next_node, rhs.head_.next_node);
-            std::swap(x.size_, rhs.size_);
+            SingleLinkedList<Type> buffer;
+            std::swap(buffer.head_.next_node, rhs.head_.next_node);
+            std::swap(buffer.size_, rhs.size_);
+            std::swap(head_.next_node, buffer.head_.next_node);
+            std::swap(size_, buffer.size_);
+            std::swap(buffer.head_.next_node, rhs.head_.next_node);
+            std::swap(buffer.size_, rhs.size_);
         }
     }
 
@@ -286,8 +286,9 @@ public:
     }
 
     void PopFront() noexcept {
-        EraseAfter(ConstIterator(&head_));
-        --size_;
+        if (GetSize() > 0) {
+            EraseAfter(ConstIterator(&head_));
+        }
     }
 
     /*
@@ -306,7 +307,7 @@ public:
     size_t size_ = 0;
 private:
     template<typename It>
-    void iterator_fill(It begin, It end) {
+    void IteratorFill(It begin, It end) {
         Clear();
         if (begin == end) { return; }
         for (Node* ptr = &head_ ;begin != end; ++begin, ptr = ptr->next_node) {
@@ -318,5 +319,5 @@ private:
 
 template<typename Type>
 void swap(SingleLinkedList<Type>& lhs, SingleLinkedList<Type>& rhs) {
-    lhs.swap(rhs);
+    lhs.Swap(rhs);
 }
