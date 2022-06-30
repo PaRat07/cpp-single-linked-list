@@ -206,7 +206,7 @@ public:
             swap(buffer);
         }
     }
-    
+
     void Swap(SingleLinkedList<Type>& rhs) noexcept {
         if (head_.next_node != rhs.head_.next_node) {
             std::swap(head_.next_node, rhs.head_.next_node);
@@ -275,12 +275,10 @@ public:
      * Если при создании элемента будет выброшено исключение, список останется в прежнем состоянии
      */
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
-        if (GetSize() > 0) {
-            Node *new_node = new Node(value, pos.node_->next_node);
-            pos.node_->next_node = new_node;
-            ++size_;
-            return Iterator(pos.node_->next_node);
-        }
+        Node *new_node = new Node(value, pos.node_->next_node);
+        pos.node_->next_node = new_node;
+        ++size_;
+        return Iterator(pos.node_->next_node);
     }
 
     void PopFront() noexcept {
@@ -292,12 +290,15 @@ public:
      * Возвращает итератор на элемент, следующий за удалённым
      */
     Iterator EraseAfter(ConstIterator pos) noexcept {
-        Node* after_deleted = pos.node_->next_node->next_node;
-        delete pos.node_->next_node;
-        pos.node_->next_node = after_deleted;
-        --size_;
-        return Iterator(after_deleted);
+        if (GetSize() > 0) {
+            Node *after_deleted = pos.node_->next_node->next_node;
+            delete pos.node_->next_node;
+            pos.node_->next_node = after_deleted;
+            --size_;
+            return Iterator(after_deleted);
+        }
     }
+
     // Фиктивный узел, используется для вставки "перед первым элементом"
     Node head_;
     size_t size_ = 0;
