@@ -20,7 +20,7 @@ class SingleLinkedList {
         Node* next_node = nullptr;
     };
 public:
-    SingleLinkedList(){}
+    SingleLinkedList() = default;
 
     SingleLinkedList(const SingleLinkedList<Type>& list) {
         IteratorFill(list.begin(), list.end());
@@ -189,15 +189,15 @@ public:
     }
 
     [[nodiscard]] bool operator!=(const SingleLinkedList<Type>& rhs) const noexcept {
-        return !(*this == rhs);
+        return !*this == rhs;
     }
 
     [[nodiscard]] bool operator>=(const SingleLinkedList<Type>& rhs) const noexcept {
-        return *this == rhs || !(*this < rhs);
+        return !*this < rhs;
     }
 
     [[nodiscard]] bool operator<=(const SingleLinkedList<Type>& rhs) const noexcept {
-        return *this == rhs || *this < rhs;
+        return !*this > rhs;
     }
 
     void operator=(const SingleLinkedList<Type>& rhs) {
@@ -206,15 +206,11 @@ public:
             swap(buffer);
         }
     }
+    
     void Swap(SingleLinkedList<Type>& rhs) noexcept {
         if (head_.next_node != rhs.head_.next_node) {
-            SingleLinkedList<Type> buffer;
-            std::swap(buffer.head_.next_node, rhs.head_.next_node);
-            std::swap(buffer.size_, rhs.size_);
-            std::swap(head_.next_node, buffer.head_.next_node);
-            std::swap(size_, buffer.size_);
-            std::swap(buffer.head_.next_node, rhs.head_.next_node);
-            std::swap(buffer.size_, rhs.size_);
+            std::swap(head_.next_node, rhs.head_.next_node);
+            std::swap(size_, rhs.size_);
         }
     }
 
@@ -279,16 +275,16 @@ public:
      * Если при создании элемента будет выброшено исключение, список останется в прежнем состоянии
      */
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
-        Node* new_node = new Node(value, pos.node_->next_node);
-        pos.node_->next_node = new_node;
-        ++size_;
-        return Iterator(pos.node_->next_node);
+        if (GetSize() > 0) {
+            Node *new_node = new Node(value, pos.node_->next_node);
+            pos.node_->next_node = new_node;
+            ++size_;
+            return Iterator(pos.node_->next_node);
+        }
     }
 
     void PopFront() noexcept {
-        if (GetSize() > 0) {
-            EraseAfter(ConstIterator(&head_));
-        }
+        EraseAfter(ConstIterator(&head_));
     }
 
     /*
